@@ -43,6 +43,8 @@
 
 // #define DEBUG
 
+#define WAIT_TIME 20000 // 20 ms
+
 
 #define q	11		    /* for 2^11 points */
 #define N	(1<<q)		/* N-point FFT, iFFT */
@@ -59,6 +61,8 @@ void *myThread(void *arg) {
 
   pthread_struct* app = (pthread_struct *) arg;
   int tmp;
+  
+  // read value from device
   read(app->fd, &tmp, 4);
   *(app->v) = (float )tmp;
 
@@ -109,27 +113,22 @@ int main(void)
 	  return( 1 );
   }
 
-  int tmp;
   int ret;
   pthread_t mythread;
   pthread_struct app;
-  struct timespec tim, tim2;
-  tim.tv_sec =  0;
-  tim.tv_nsec = 20000000L;
   app.fd = fd;
+  long delta_us;
 
   #ifdef DEBUG
-    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-    long delta_us;
+    
   #endif
 
   while(1) {
-    #ifdef DEBUG
-      clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-      long delta_us;
-    #endif
 
-	//Initialize the complex array for FFT computation
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+
+	  //Initialize the complex array for FFT computation
 	  for(k=0; k<N; k++) {
 		  app.v = &v[k].Re;
 		  v[k].Im = 0;
@@ -139,43 +138,38 @@ int main(void)
 			  exit(-1);
 		  }
 
-		  if(nanosleep(&tim , &tim2) < 0 )
-      {
-        printf("Nano sleep system call failed \n");
-        return -1;
-      }
+      // sleep for 20 ms before read next value (f = 50 Hz)
+		  usleep(WAIT_TIME);
 		  pthread_join(mythread, NULL);
-
 	  }
 
-	// FFT computation
+	  // FFT computation
 	  fft( v, N, scratch );
 
-	// PSD computation
-	  for(k=0; k<N; k++) {
+	  // PSD computation
+  	  for(k=0; k<N; k++) {
 		abs[k] = (50.0/2048)*((v[k].Re*v[k].Re)+(v[k].Im*v[k].Im));
 	  }
 
 	  minIdx = (0.5*2048)/50;   // position in the PSD of the spectral line corresponding to 30 bpm
 	  maxIdx = 3*2048/50;       // position in the PSD of the spectral line corresponding to 180 bpm
 
-	// Find the peak in the PSD from 30 bpm to 180 bpm
+  	// Find the peak in the PSD from 30 bpm to 180 bpm
 	  m = minIdx;
 	  for(k=minIdx; k<(maxIdx); k++) {
       if( abs[k] > abs[m] )
       m = k;
 	  }
 
-	// Print the heart beat in bpm
-	  fprintf(stdout, "%u\n", (unsigned)time(NULL));
+	  // Print the heart beat in bpm
 	  printf( "\n\n\n%d bpm", (m)*60*50/2048 );
-
-    #ifdef DEBUG
-      clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-      delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
-      printf(" --> Time: %lu us\n\n\n",delta_us);
-    #endif
+    //calculate time to compute operation
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+    printf(" --> Time: %lu us\n",delta_us);
   }
+
+  close(fd);
 
   exit(EXIT_SUCCESS);
 }
