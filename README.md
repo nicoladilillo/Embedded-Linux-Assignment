@@ -103,7 +103,7 @@ Connect one side of yout ethernet cable to PC and the other to raspberry, put yo
 $ ssh root@192.168.1.2
 ```
 
-Now is possibile execute all possible operation on target from PC, for istance we can run the application ``heartbreak``.
+Now is possibile execute all possible operation on target from PC, for istance run the application ``heartbreak``.
 
 ## Note
 
