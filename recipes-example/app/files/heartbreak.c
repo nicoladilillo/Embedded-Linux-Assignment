@@ -60,6 +60,7 @@ typedef struct{int fd; real* v;} pthread_struct;
 void *myThread(void *arg) {
 
   pthread_struct* app = (pthread_struct *) arg;
+  // temporaly variable
   int tmp;
   
   // read value from device
@@ -166,7 +167,7 @@ int main(void)
     //calculate time to compute operation
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
     delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
-    printf(" --> Time: %lu us\n",delta_us);
+    printf(" --> Time: %lu ms\n",delta_us/(1000));
   }
 
   close(fd);
