@@ -2,17 +2,99 @@ This README file contains information on the contents of the assignment layer.
 
 Please see the corresponding sections below for details.
 
-## How Adding the assignment layer to your build
 
-To add the assignment layer to build first clone this repository:
+# How adding the assignment layer to your build
 
-``git clone https://github.com/nicoladilillo/Embedded-Linux-Assignment.git``
+To add the assignment layer to build first clone this repository in poky directory:
 
-Then add this layer to build and run:
+```
+$ cd ~/poky
+$ git clone https://github.com/nicoladilillo/Embedded-Linux-Assignment.git
+```
 
-``bitbake-layers add-layer assignment``
+After run the following command:
+```
+$ source oe-init-build-env  <your_target>
+```
+
+Then add this layer to build:
+```
+$ bitbake-layers add-layer ../assignment
+```
+
+Next in ``recipies-example/PPG`` set the value of line 7 with your target, that default this value is set to ``"qemuarm"``
+```
+COMPATIBLE_MACHINE = "<your_target>"
+```
+
+And add the following line at the end of ``conf/local.conf``, in your target folder:
+```
+IMAGE_INSTALL_append = " ppg heartbreak"
+KERNEL_MODULE_AUTOLOAD += " ppg"
+```
 
 At the end build the new image:
+```
+$ bitbake core-image-minimal
+```
 
-``bitbake core-image-minimal``
+## Note
 
+To default all this operations are set from qemuarm machine.
+
+
+# How run application
+
+To execute the application run the command:
+```
+$ heartbreak
+```
+
+
+# How configure on Raspberry Pi
+
+After executing all previous instraction with <your_target> set to "raspberry" (any version will work) configure the interfaces. Move to:
+```
+$ cd ~/poky/meta/recipes-core/init-ifupdown/init-ifupdown-1.0/raspberrypi
+```
+
+In this place put a file named ``interfaces`` with the following content:
+```
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+# The loopback interface auto lo
+auto lo
+iface lo inet loopback
+
+# Wired or wireless interfaces auto eth0
+auto eth0
+iface eth0 inet static
+	address 192.168.1.2
+	netmask 255.255.255.0
+	gateway 192.168.1.1
+	network 192.168.1.0
+```
+
+Then build the system as follows:
+```
+$ bitbake core-image-full-cmdline
+```
+
+Once the build process is completed, you will have a brand new Linux image ready for being copied to a Micro SD as
+follows (assuming the Micro SD is available as /dev/sdb ; if a native Linux machine is used, the Micro SD is likely to
+be available as / dev/mmcblk0 ).
+
+Warning: double check which is the correct output device ( of=<output device> ) you are using. The following ommand can wipe out your hard disk.
+```
+$ sudo dd if=tmp/deploy/images/raspberrypi/core-image-full-cmdline-raspberrypi.rpi-sdimg of=/dev/sdb
+```
+
+Connect one side of yout ethernet cable to PC and the other to raspberry, put your the Micro SD inside it and switch on. Set the ethernet interface of PC with an IP that belong to Network of raspberry, for example 192.168.1.1. In this way we can connect to raspberry with the following command:
+```
+$ ssh root@192.168.1.2
+```
+
+Now is possibile execute all possible operation on target from PC, for istance we can run the application ``heartbreak``.
+
+## Note
+
+All this operations on raspberry can be done with different version (example: raspberry2, raspberry3, ...).
