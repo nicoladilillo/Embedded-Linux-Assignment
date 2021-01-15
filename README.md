@@ -78,6 +78,12 @@ iface eth0 inet static
 	network 192.168.1.0
 ```
 
+And add the following line at the end of ``conf/local.conf``:
+```
+EXTRA_IMAGE_FEATURES ?= "debug-tweaks tools-debug eclipse-debug ssh-server-openssh"
+IMAGE_FSTYPES = "tar.xz ext3 rpi-sdimg"
+```
+
 Then build the system as follows:
 ```
 $ bitbake core-image-full-cmdline
@@ -102,3 +108,8 @@ Now is possibile execute all possible operation on target from PC, for istance w
 ## Note
 
 All this operations on raspberry can be done with different version (example: raspberry2, raspberry3, ...).
+
+Is possible connect to raspberry also by UART connection and addind to ``conf/local.conf`` the following line:
+```
+ENABLE_UART = "1"
+```

@@ -1,3 +1,7 @@
+/*
+    A Linux character-based driver (cDD) used to access a “virtual” Photopletismography (PPG) sensor
+*/
+
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
@@ -23,6 +27,7 @@ static int i;
 
 ssize_t PPG_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
+    //  Copy a block of data into user space
     if (copy_to_user(buf, &data[i++], sizeof(&data[0])) == 0)
         printk(KERN_INFO "[PPG] read (position=%d, data=%d)\n", i, *((int *)buf));
     else
