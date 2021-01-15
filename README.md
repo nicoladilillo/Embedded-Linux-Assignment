@@ -44,6 +44,10 @@ To default all this operations are set from qemuarm machine.
 
 
 # How run application
+First run the machine:
+```
+$ runqemu <your_target>
+```
 
 To execute the application run the command:
 ```
