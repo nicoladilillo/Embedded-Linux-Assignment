@@ -23,7 +23,8 @@ struct class *myclass = NULL;
 
 static char buffer[64];
 
-static int i;
+// index for value to read from static data array
+static uint16_t i;
 
 ssize_t PPG_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
@@ -31,7 +32,7 @@ ssize_t PPG_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     if (copy_to_user(buf, &data[i++], sizeof(&data[0])) == 0)
         printk(KERN_INFO "[PPG] read (position=%d, data=%d)\n", i, *((int *)buf));
     else
-        printk(KERN_INFO "[PPG] no read all (position=%d, data=%d,)\n", i, *((int *)buf));
+        printk(KERN_INFO "[PPG] error to read (position=%d, data=%d,)\n", i, *((int *)buf));
 
     // if read all value, start from zero again
     if (i == 2048) 

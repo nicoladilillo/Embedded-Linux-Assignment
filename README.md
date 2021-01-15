@@ -19,7 +19,7 @@ $ source oe-init-build-env  <your_target>
 
 Then add this layer to build:
 ```
-$ bitbake-layers add-layer ../assignment
+$ bitbake-layers add-layer ../Embedded-Linux-Assignment
 ```
 
 Next in ``recipies-example/PPG`` set the value of line 7 with your target, that default this value is set to ``"qemuarm"``
@@ -40,7 +40,7 @@ $ bitbake core-image-minimal
 
 ## Note
 
-To default all this operations are set from qemuarm machine.
+To default all this operations are set for Raspberry Pi 1.
 
 
 # How run application
