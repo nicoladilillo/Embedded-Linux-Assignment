@@ -41,6 +41,9 @@
 
 #include <sys/time.h>
 
+/*
+* Uncomment this line to see the time to elaborate each single value
+*/
 // #define DEBUG
 
 #define WAIT_TIME 20000 // 20 ms
@@ -104,7 +107,9 @@ int main(void)
   int i;
   int minIdx, maxIdx;
 
-  struct timespec start, end;
+  #ifdef DEBUG
+    struct timespec start, end;
+  #endif
 
   char *dev_name = "/dev/PPG_dev";
   int fd = -1;
@@ -118,16 +123,15 @@ int main(void)
   pthread_t mythread;
   pthread_struct app;
   app.fd = fd;
-  long delta_us;
 
   #ifdef DEBUG
-    
+    long delta_us;
   #endif
 
   while(1) {
-
-    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
+    #ifdef DEBUG
+      clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+    #endif
 
 	  //Initialize the complex array for FFT computation
 	  for(k=0; k<N; k++) {
@@ -148,8 +152,8 @@ int main(void)
 	  fft( v, N, scratch );
 
 	  // PSD computation
-  	  for(k=0; k<N; k++) {
-		abs[k] = (50.0/2048)*((v[k].Re*v[k].Re)+(v[k].Im*v[k].Im));
+  	for(k=0; k<N; k++) {
+		  abs[k] = (50.0/2048)*((v[k].Re*v[k].Re)+(v[k].Im*v[k].Im));
 	  }
 
 	  minIdx = (0.5*2048)/50;   // position in the PSD of the spectral line corresponding to 30 bpm
@@ -164,10 +168,13 @@ int main(void)
 
 	  // Print the heart beat in bpm
 	  printf( "\n\n\n%d bpm", (m)*60*50/2048 );
-    //calculate time to compute operation
-    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-    delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
-    printf(" --> Time: %lu ms\n",delta_us/(1000));
+
+    #ifdef DEBUG
+      //calculate time to compute operation
+      clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+      delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+      printf(" --> Time: %lu ms\n",delta_us/(1000));
+    #endif
   }
 
   close(fd);

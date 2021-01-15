@@ -15,6 +15,8 @@
 
 #include "data.h"
 
+#define MAX_DATA 2048
+
 static dev_t PPG_dev;
 
 struct cdev PPG_cdev;
@@ -23,28 +25,23 @@ struct class *myclass = NULL;
 
 static char buffer[64];
 
-// index for value to read from static data array
-static uint16_t i;
-
 ssize_t PPG_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
     //  Copy a block of data into user space
-    if (copy_to_user(buf, &data[i++], sizeof(&data[0])) == 0)
-        printk(KERN_INFO "[PPG] read (position=%d, data=%d)\n", i, *((int *)buf));
+    if (copy_to_user(buf, &data[(int)(*f_pos)++], sizeof(&data[0])) == 0)
+        printk(KERN_INFO "[PPG] read (position=%d, data=%d)\n", (int)(*f_pos), *((int *)buf));
     else
-        printk(KERN_INFO "[PPG] error to read (position=%d, data=%d,)\n", i, *((int *)buf));
+        printk(KERN_INFO "[PPG] error to read (position=%d, data=%d,)\n", (int)(*f_pos), *((int *)buf));
 
     // if read all value, start from zero again
-    if (i == 2048) 
-        i = 0;
+    if (*f_pos == MAX_DATA) 
+        *f_pos = 0;
 
     return count;
 }
 
 int PPG_open(struct inode *inode, struct file *filp)
 {
-    // at the beginning start reading from first value
-    i = 0;
     printk(KERN_INFO "[PPG] open device driver\n");
 
     return 0;

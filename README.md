@@ -1,7 +1,6 @@
-This README file contains information on the contents of the assignment layer.
+This README file contains information on the contents of the assignment layer for Operating systems for embedded systems.
 
 Please see the corresponding sections below for details.
-
 
 # How adding the assignment layer to your build
 
@@ -9,7 +8,7 @@ To add the assignment layer to build first clone this repository in poky directo
 
 ```
 $ cd ~/poky
-$ git clone https://github.com/nicoladilillo/Embedded-Linux-Assignment.git
+$ git clone https://github.com/nicoladilillo/meta-assignment.git
 ```
 
 After run the following command:
@@ -19,17 +18,17 @@ $ source oe-init-build-env  <your_target>
 
 Then add this layer to build:
 ```
-$ bitbake-layers add-layer ../Embedded-Linux-Assignment
+$ bitbake-layers add-layer ../meta-assignment
 ```
 
-Next in ``recipies-example/PPG`` set the value of line 7 with your target, that default this value is set to ``"qemuarm"``
+Next in ``recipies-example/PPG`` set the value of line 7 with your target, that default this value is set to ``"raspberry"``
 ```
 COMPATIBLE_MACHINE = "<your_target>"
 ```
 
 And add the following line at the end of ``conf/local.conf``, in your target folder:
 ```
-IMAGE_INSTALL_append = " ppg heartbreak"
+IMAGE_INSTALL_append = " ppg heartrate"
 KERNEL_MODULE_AUTOLOAD += " ppg"
 ```
 
@@ -51,9 +50,15 @@ $ runqemu <your_target>
 
 To execute the application run the command:
 ```
-$ heartbreak
+$ heartrate
 ```
 
+## Note
+
+To see the time to elaborate each single value uncomment the line 47 of ``../assignment/recipes-example/heartrate/files/heartrate.c``
+```
+#define DEBUG
+```
 
 # How configure on Raspberry Pi
 
@@ -109,7 +114,7 @@ Now is possibile execute all possible operation on target from PC, for istance r
 
 All this operations on raspberry can be done with different version (example: raspberry2, raspberry3, ...).
 
-Is possible connect to raspberry also by UART connection and addind to ``conf/local.conf`` the following line:
+Is possible connect to raspberry also by UART connection just adding to ``conf/local.conf`` the following line:
 ```
 ENABLE_UART = "1"
 ```
