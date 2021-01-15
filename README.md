@@ -2,6 +2,7 @@ This README file contains information on the contents of the assignment layer fo
 
 Please see the corresponding sections below for details.
 
+
 # How adding the assignment layer to your build
 
 To add the assignment layer to build first clone this repository in poky directory:
@@ -21,12 +22,12 @@ Then add this layer to build:
 $ bitbake-layers add-layer ../meta-assignment
 ```
 
-Next in ``recipies-example/PPG`` set the value of line 7 with your target, that default this value is set to ``"raspberry"``
+Next in ``recipies-heartrate/PPG/ppg.bb`` set the value of line 7 with your target, that by default is set to ``"raspberry"``
 ```
 COMPATIBLE_MACHINE = "<your_target>"
 ```
 
-And add the following line at the end of ``conf/local.conf``, in your target folder:
+Add the following line at the end of ``conf/local.conf``, in your target folder:
 ```
 IMAGE_INSTALL_append = " ppg heartrate"
 KERNEL_MODULE_AUTOLOAD += " ppg"
@@ -37,13 +38,8 @@ At the end build the new image:
 $ bitbake core-image-minimal
 ```
 
-## Note
-
-To default all this operations are set for Raspberry Pi 1.
-
-
 # How run application
-First run the machine:
+First run the machine (or turn on your device):
 ```
 $ runqemu <your_target>
 ```
@@ -55,7 +51,7 @@ $ heartrate
 
 ## Note
 
-To see the time to elaborate each single value uncomment the line 47 of ``../assignment/recipes-example/heartrate/files/heartrate.c``
+To see the time to elaborate each single value uncomment the line 47 of ``../assignment/recipes-example/heartrate/files/heartrate.c`` and build the new image
 ```
 #define DEBUG
 ```
@@ -103,7 +99,7 @@ Warning: double check which is the correct output device ( of=<output device> ) 
 $ sudo dd if=tmp/deploy/images/raspberrypi/core-image-full-cmdline-raspberrypi.rpi-sdimg of=/dev/sdb
 ```
 
-Connect one side of yout ethernet cable to PC and the other to raspberry, put your the Micro SD inside it and switch on. Set the ethernet interface of PC with an IP that belong to Network of raspberry, for example 192.168.1.1. In this way we can connect to raspberry with the following command:
+Connect one side of yout ethernet cable to PC and the other to raspberry, put the Micro SD inside it and turn on the device. Set, on the ethernet interface of PC, a IP adress that belong to the same network of raspberry, for example 192.168.1.1. In this way we can connect to raspberry with the following command:
 ```
 $ ssh root@192.168.1.2
 ```
